@@ -1,0 +1,15 @@
+﻿<Window x:Name="startw" x:Class="Dungeon_XXX.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Dungeon_XXX"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Image Margin="0,0,-0.4,-4" Source="menuFon.jpg" Stretch="Fill"/>
+        <Image x:Name="exbut" Margin="13,289,0,0" Source="ExitMenu1.png" Stretch="Fill" MouseEnter="exbut_MouseEnter" MouseLeave="exbut_MouseLeave" MouseLeftButtonDown="exbut_MouseLeftButtonDown" Height="64" VerticalAlignment="Top" HorizontalAlignment="Left" Width="263"/>
+        <Image x:Name="setbut"  Margin="10,191,0,0" Source="SettingsMenu3.png" Stretch="Fill" MouseEnter="setbut_MouseEnter" MouseLeave="setbut_MouseLeave" Height="84" VerticalAlignment="Top" HorizontalAlignment="Left" Width="436"/>
+        <Image x:Name="stbut"  Margin="10,137,0,0" Source="StartMenu2.png" Stretch="Fill" MouseEnter="stbut_MouseEnter" MouseLeave="stbut_MouseLeave" Height="65" VerticalAlignment="Top" HorizontalAlignment="Left" Width="288" MouseLeftButtonDown="stbut_MouseLeftButtonDown"/>
+    </Grid>
+</Window>
