@@ -21,6 +21,7 @@ namespace Dungeon_XXX
     /// 
     public partial class MainWindow : Window
     {
+        int a;
         Window main = new Window();
         public MainWindow()
         {
