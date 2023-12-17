@@ -65,11 +65,24 @@ namespace Dungeon_XXX
 
         private void stbut_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            
-            main.Show();
             this.Hide();
+            var game = new Lobby();
+            game.Owner = this;
+            game.ShowDialog();
+            Rectangle pl = new Rectangle();
+            pl.HorizontalAlignment = HorizontalAlignment.Left;
+            pl.VerticalAlignment = VerticalAlignment.Top;
+            pl.Height = 55;
+            pl.Width = 55;
+            pl.Margin = new Thickness(400, 225, 0, 0);
+            pl.Fill = Brushes.Black;
+            pl.Stroke = Brushes.Black;
+           
+
+
 
         }
+
       
     }
 }
