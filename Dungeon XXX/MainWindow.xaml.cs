@@ -30,32 +30,32 @@ namespace Dungeon_XXX
 
         private void exbut_MouseEnter(object sender, MouseEventArgs e)
         {
-            exbut.Source = BitmapFrame.Create(new Uri(@"C:\Users\Shepe\source\repos\Dungeon XXX\Dungeon XXX\Menupng\ExitAction.png"));
+            exbut.Source = BitmapFrame.Create(new Uri(@"Menupng\ExitAction.png", UriKind.Relative));
         }
 
         private void exbut_MouseLeave(object sender, MouseEventArgs e)
         {
-            exbut.Source = BitmapFrame.Create(new Uri(@"C:\Users\Shepe\source\repos\Dungeon XXX\Dungeon XXX\Menupng\ExitMenu1.png"));
+            exbut.Source = BitmapFrame.Create(new Uri(@"Menupng\ExitMenu1.png", UriKind.Relative));
         }
 
         private void stbut_MouseEnter(object sender, MouseEventArgs e)
         {
-            stbut.Source = BitmapFrame.Create(new Uri(@"C:\Users\Shepe\source\repos\Dungeon XXX\Dungeon XXX\Menupng\StartActiom.png"));
+            stbut.Source = BitmapFrame.Create(new Uri(@"Menupng\StartActiom.png", UriKind.Relative));
         }
 
         private void stbut_MouseLeave(object sender, MouseEventArgs e)
         {
-            stbut.Source = BitmapFrame.Create(new Uri(@"C:\Users\Shepe\source\repos\Dungeon XXX\Dungeon XXX\Menupng\StartMenu2.png"));
+            stbut.Source = BitmapFrame.Create(new Uri(@"Menupng\StartMenu2.png", UriKind.Relative));
         }
 
         private void setbut_MouseEnter(object sender, MouseEventArgs e)
         {
-            setbut.Source = BitmapFrame.Create(new Uri(@"C:\Users\Shepe\source\repos\Dungeon XXX\Dungeon XXX\Menupng\SettingsAction.png"));
+            setbut.Source = BitmapFrame.Create(new Uri(@"Menupng\SettingsAction.png", UriKind.Relative));
         }
 
         private void setbut_MouseLeave(object sender, MouseEventArgs e)
         {
-            setbut.Source = BitmapFrame.Create(new Uri(@"C:\Users\Shepe\source\repos\Dungeon XXX\Dungeon XXX\Menupng\SettingsMenu3.png"));
+            setbut.Source = BitmapFrame.Create(new Uri(@"Menupng\SettingsMenu3.png", UriKind.Relative));
         }
 
         private void exbut_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -69,20 +69,13 @@ namespace Dungeon_XXX
             var game = new Lobby();
             game.Owner = this;
             game.ShowDialog();
-            Rectangle pl = new Rectangle();
-            pl.HorizontalAlignment = HorizontalAlignment.Left;
-            pl.VerticalAlignment = VerticalAlignment.Top;
-            pl.Height = 55;
-            pl.Width = 55;
-            pl.Margin = new Thickness(400, 225, 0, 0);
-            pl.Fill = Brushes.Black;
-            pl.Stroke = Brushes.Black;
+            
            
 
 
-
+            
         }
-
+        
       
     }
 }
