@@ -7,6 +7,10 @@
         mc:Ignorable="d"
         Title="Lobby" Height="1080" Width="1920 ">
     <Grid x:Name="gridlobby">
-        <Image Margin="-6,0,-0.4,0.4" Source="lobbyback.png" Stretch="Fill"/>
+        <Canvas x:Name="LobbyCan" Focusable="True" KeyUp="KeyBoardUp" KeyDown="KeyboardDown">
+            
+                <Image Source="lobbyback.png" Stretch="Fill" Height="1050" Canvas.Left="-6" Width="1920"/>
+            <Rectangle Canvas.Left="50" Canvas.Top="50" Width="100" Height="100" Fill="Black" x:Name="Player"></Rectangle>
+        </Canvas>
     </Grid>
 </Window>
