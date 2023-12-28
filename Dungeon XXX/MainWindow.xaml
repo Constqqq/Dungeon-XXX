@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid x:Name="grid">
+        
         <Image x:Name="backm" Margin="0,0,-0.4,-4" Source="menuFon.jpg" Stretch="Fill"/>
         <Image x:Name="exbut" Margin="13,289,0,0" Source="ExitMenu1.png" Stretch="Fill" MouseEnter="exbut_MouseEnter" MouseLeave="exbut_MouseLeave" MouseLeftButtonDown="exbut_MouseLeftButtonDown" Height="64" VerticalAlignment="Top" HorizontalAlignment="Left" Width="263"/>
         <Image x:Name="setbut"  Margin="10,191,0,0" Source="SettingsMenu3.png" Stretch="Fill" MouseEnter="setbut_MouseEnter" MouseLeave="setbut_MouseLeave" Height="84" VerticalAlignment="Top" HorizontalAlignment="Left" Width="436"/>

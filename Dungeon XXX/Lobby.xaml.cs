@@ -74,8 +74,8 @@ namespace Dungeon_XXX
             GameTimer.Tick += Gametick;
             GameTimer.Start();
         }
-        private void Gametick (object sender, EventArgs e)
-            {
+        private void Gametick(object sender, EventArgs e)
+        {
             if (UpkeyPressed)
             {
                 SpeedY += Speed;
@@ -95,9 +95,40 @@ namespace Dungeon_XXX
             SpeedX = SpeedX * Friction;
             SpeedY = SpeedY * Friction;
             Canvas.SetLeft(Player, Canvas.GetLeft(Player) + SpeedX);
+            Collide("x");
             Canvas.SetTop(Player, Canvas.GetTop(Player) - SpeedY);
+            Collide("y");
         }
+
+        private void Collide(string Dir)
+        {
+        foreach (var x in LobbyCan.Children.OfType<Rectangle>())
+            {
+                if ((string)x.Tag == "Collide")
+                {
+                    Rect PlayerHB = new Rect(Canvas.GetLeft(Player), Canvas.GetTop(Player), Player.Width, Player.Height);
+                    Rect ToCollide = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
+                         if (PlayerHB.IntersectsWith(ToCollide))
+                    {
+                        if (Dir == "x")
+                        {
+                            Canvas.SetLeft(Player, Canvas.GetLeft(Player) - SpeedX);
+                            SpeedX = 0;
+                        }
+                        else
+                        {
+                            Canvas.SetTop(Player, Canvas.GetTop(Player) + SpeedY);
+                            SpeedY = 0;
+                        }
+
+
+                    }
+                }
+
+                
+            }
+        }   
+
         
-       
     }
 }
