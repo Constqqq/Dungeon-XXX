@@ -170,5 +170,8 @@
   <ItemGroup>
     <Resource Include="lobbyback.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="lobbyback2.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

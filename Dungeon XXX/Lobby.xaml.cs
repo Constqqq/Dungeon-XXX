@@ -15,6 +15,7 @@ using System.Windows.Threading;
 
 
 
+
 namespace Dungeon_XXX
 {
     /// <summary>
@@ -22,9 +23,139 @@ namespace Dungeon_XXX
     /// </summary>
     public partial class Lobby : Window
     {
+        private int magazineSize = 10;
+        private int totalAmmo = 50;
+        private int bulletsInMagazine;
+        private bool isReloading;
+        private double currentBulletAngle = 0;
+        private Rectangle Bullet;
         private DispatcherTimer GameTimer = new DispatcherTimer();
         private bool UpkeyPressed, RightKeyPressed, DownKeyPressed, LeftKeyPressed;
         float SpeedX, SpeedY, Friction = 0.88f, Speed = 2;
+
+        public Lobby()
+        {
+
+
+            InitializeComponent();
+           
+            LobbyCan.Focus();
+            LobbyCan.IsHitTestVisible = true;
+
+            GameTimer.Interval = TimeSpan.FromMilliseconds(16);
+            GameTimer.Tick += Gametick;
+            GameTimer.Start();
+            InitializeBullet();
+            InitializeAmmo();
+            this.MouseDown += LobbyCan_MouseDown;
+
+        }
+        private List<Rectangle> bullets = new List<Rectangle>();
+
+
+        private void InitializeAmmo()
+        {
+            bulletsInMagazine = magazineSize;
+            totalAmmo = 50;
+            isReloading = false;
+
+            UpdateAmmoInfo();  // Добавлен вызов для обновления информации о патронах
+        }
+
+        private void UpdateAmmoInfo()
+        {
+            AmmoInfo.Text = $"Ammo: {totalAmmo}";
+            MagazineInfo.Text = $"Magazine: {bulletsInMagazine}/{magazineSize}";
+        }
+
+
+        private void LobbyCan_MouseMove(object sender, MouseEventArgs e)
+        {
+            Point mousePosition = e.GetPosition(LobbyCan);
+
+            currentBulletAngle = Math.Atan2(mousePosition.Y - (Canvas.GetTop(Player) + Player.Height / 2),
+                                             mousePosition.X - (Canvas.GetLeft(Player) + Player.Width / 2));
+        }
+
+
+        private void LobbyCan_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed && !isReloading)
+            {
+                if (bulletsInMagazine > 0)
+                {
+                    Point mousePosition = e.GetPosition(LobbyCan);
+                    double angleRad = Math.Atan2(mousePosition.Y - (Canvas.GetTop(Player) + Player.Height / 2),
+                                                 mousePosition.X - (Canvas.GetLeft(Player) + Player.Width / 2));
+
+                    CreateBullet(angleRad);
+                    bulletsInMagazine--;
+
+                    if (bulletsInMagazine == 0)
+                    {
+                        StartReload();
+                    }
+
+                    UpdateAmmoInfo();  // Добавлен вызов для обновления информации о патронах после выстрела
+                }
+                else if (totalAmmo > 0)
+                {
+                    StartReload();
+                    UpdateAmmoInfo();  // Добавлен вызов для обновления информации о патронах после начала перезарядки
+                }
+            }
+        }
+
+
+        private void StartReload()
+        {
+            if (!isReloading && totalAmmo > 0 && bulletsInMagazine < magazineSize)
+            {
+                isReloading = true;
+
+                var reloadTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+                reloadTimer.Tick += (sender, args) =>
+                {
+                    int bulletsToReload = Math.Min(magazineSize - bulletsInMagazine, totalAmmo);
+                    bulletsInMagazine += bulletsToReload;
+                    totalAmmo -= bulletsToReload;
+                    isReloading = false;
+
+                    reloadTimer.Stop();
+                    UpdateAmmoInfo();  // Добавлен вызов для обновления информации о патронах после перезарядки
+                };
+
+                reloadTimer.Start();
+            }
+        }
+        private void CreateBullet(double angleRad)
+        {
+            Rectangle bullet = new Rectangle
+            {
+                Width = 10,
+                Height = 20,
+                Fill = Brushes.Red,
+                Visibility = Visibility.Visible
+            };
+
+            double startX = Canvas.GetLeft(Player) + Player.Width / 2 - bullet.Width / 2;
+            double startY = Canvas.GetTop(Player) + Player.Height / 2 - bullet.Height / 2;
+
+            Canvas.SetLeft(bullet, startX);
+            Canvas.SetTop(bullet, startY);
+
+            LobbyCan.Children.Add(bullet);
+            bullets.Add(bullet);
+
+            var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(20) };
+            timer.Tick += (sender, args) =>
+            {
+                MoveBullet(bullet, angleRad);
+            };
+
+            timer.Start();
+        }
+
         private void KeyboardDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.W)
@@ -43,7 +174,41 @@ namespace Dungeon_XXX
             {
                 RightKeyPressed = true;
             }
+
         }
+
+
+
+        private void MoveBullet(Rectangle bullet, double angleRad)
+        {
+            double bulletSpeed = 5;
+
+            double deltaX = bulletSpeed * Math.Cos(angleRad);
+            double deltaY = bulletSpeed * Math.Sin(angleRad);
+
+            double newLeft = Canvas.GetLeft(bullet) + deltaX;
+            double newTop = Canvas.GetTop(bullet) + deltaY;
+
+            // Проверка столкновения с объектами, имеющими тег "Collide"
+            foreach (var x in LobbyCan.Children.OfType<Rectangle>().Where(obj => (string)obj.Tag == "Collide"))
+            {
+                Rect bulletRect = new Rect(newLeft, newTop, bullet.Width, bullet.Height);
+                Rect collideRect = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
+
+                if (bulletRect.IntersectsWith(collideRect))
+                {
+                    // Удалить пулю
+                    LobbyCan.Children.Remove(bullet);
+                    bullets.Remove(bullet);
+                    return;
+                }
+            }
+
+            Canvas.SetLeft(bullet, newLeft);
+            Canvas.SetTop(bullet, newTop);
+        }
+
+
 
         private void KeyBoardUp(object sender, KeyEventArgs e)
         {
@@ -65,15 +230,22 @@ namespace Dungeon_XXX
             }
         }
 
-        public Lobby()
-        {
-            InitializeComponent();
-            LobbyCan.Focus();
+        
 
-            GameTimer.Interval = TimeSpan.FromMilliseconds(16);
-            GameTimer.Tick += Gametick;
-            GameTimer.Start();
+        private void InitializeBullet()
+        {
+            Bullet = new Rectangle
+            {
+                Width = 10,
+                Height = 20,
+                Fill = Brushes.Red,
+                Visibility = Visibility.Hidden,
+                Tag = "Bullet"
+            };
+
+            LobbyCan.Children.Add(Bullet);
         }
+
         private void Gametick(object sender, EventArgs e)
         {
             if (UpkeyPressed)
@@ -99,6 +271,15 @@ namespace Dungeon_XXX
             Canvas.SetTop(Player, Canvas.GetTop(Player) - SpeedY);
             Collide("y");
         }
+
+        
+
+
+        
+
+
+       
+
 
         private void Collide(string Dir)
         {
