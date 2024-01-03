@@ -12,7 +12,7 @@
         <TextBlock x:Name="MagazineInfo" Text="Magazine: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,30,0,0"/>
         <Canvas x:Name="LobbyCan" Focusable="True" KeyUp="KeyBoardUp" KeyDown="KeyboardDown" Height="861" Width="1570"  VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,-0.2"  >
 
-            
+
             <Rectangle  Canvas.Left="490" Canvas.Top="385" Width="41" Height="128"  Tag="Collide" RenderTransformOrigin="0.932,0.777"></Rectangle>
             <Rectangle  Canvas.Left="1339" Canvas.Top="471" Width="41" Height="119"  Tag="Collide" RenderTransformOrigin="0.932,0.777"></Rectangle>
             <Rectangle  Canvas.Left="1230" Canvas.Top="691" Width="32" Height="112"  Tag="Collide" RenderTransformOrigin="0.932,0.777"></Rectangle>
@@ -36,6 +36,7 @@
 
 
             <Rectangle  Canvas.Left="50" Canvas.Top="105" Width="100" Height="100" Fill="Black" Tag="User" x:Name="Player"></Rectangle>
+            <ProgressBar x:Name="HealthBar" Height="20" Canvas.Left="1339" Canvas.Top="11" Width="200" Foreground="Green" Background="Gray"/>
 
         </Canvas>
 

@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Dungeon_XXX;
 
 
 
@@ -23,6 +24,8 @@ namespace Dungeon_XXX
     /// </summary>
     public partial class Lobby : Window
     {
+        private Enemy enemy;
+        private int PlayerHealth = 6;
         private int magazineSize = 10;
         private int totalAmmo = 50;
         private int bulletsInMagazine;
@@ -32,13 +35,12 @@ namespace Dungeon_XXX
         private DispatcherTimer GameTimer = new DispatcherTimer();
         private bool UpkeyPressed, RightKeyPressed, DownKeyPressed, LeftKeyPressed;
         float SpeedX, SpeedY, Friction = 0.88f, Speed = 2;
-
         public Lobby()
+        
         {
 
-
             InitializeComponent();
-           
+            
             LobbyCan.Focus();
             LobbyCan.IsHitTestVisible = true;
 
@@ -48,9 +50,23 @@ namespace Dungeon_XXX
             InitializeBullet();
             InitializeAmmo();
             this.MouseDown += LobbyCan_MouseDown;
+            InitializeEnemy(LobbyCan);
 
         }
         private List<Rectangle> bullets = new List<Rectangle>();
+
+        private void InitializeEnemy(Canvas LobbyCan)
+        {
+            enemy = new Enemy(LobbyCan.ActualWidth / 2, 50);
+            LobbyCan.Children.Add(enemy.EnemyRect);
+        }
+
+
+
+        private void TakeDamage (int damageAmount = 1)
+        {
+            PlayerHealth -= damageAmount;
+        }
 
 
         private void InitializeAmmo()
@@ -174,6 +190,10 @@ namespace Dungeon_XXX
             {
                 RightKeyPressed = true;
             }
+            if (e.Key == Key.R)
+            {
+                StartReload();
+            }
 
         }
 
@@ -181,7 +201,7 @@ namespace Dungeon_XXX
 
         private void MoveBullet(Rectangle bullet, double angleRad)
         {
-            double bulletSpeed = 5;
+            double bulletSpeed = 7;
 
             double deltaX = bulletSpeed * Math.Cos(angleRad);
             double deltaY = bulletSpeed * Math.Sin(angleRad);
@@ -270,17 +290,16 @@ namespace Dungeon_XXX
             Collide("x");
             Canvas.SetTop(Player, Canvas.GetTop(Player) - SpeedY);
             Collide("y");
+           // enemy.MoveTowardsPlayer(Player);
+            enemy.ShootAtPlayer(Player, LobbyCan);
+            enemy.UpdateBullets(LobbyCan);
+           
         }
 
-        
 
-
-        
 
 
        
-
-
         private void Collide(string Dir)
         {
         foreach (var x in LobbyCan.Children.OfType<Rectangle>())
