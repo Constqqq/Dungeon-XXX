@@ -9,8 +9,9 @@ using System.Windows;
 
 public class Enemy
 {
-    private Canvas LobbyCan;
+
     
+    private double enemySpeed = 2;
     public Rectangle EnemyRect { get; set; }
     public List<Bullet> Bullets { get; set; } = new List<Bullet>();
 
@@ -28,6 +29,28 @@ public class Enemy
 
         Bullets = new List<Bullet>();
     }
+
+
+    public void MoveTowardsPlayer(Rectangle Player)
+    {
+        double playerX = Canvas.GetLeft(Player) + Player.Width / 2;
+        double playerY = Canvas.GetTop(Player) +Player.Height / 2;
+
+        double enemyX = Canvas.GetLeft(EnemyRect) + EnemyRect.Width / 2;
+        double enemyY = Canvas.GetTop(EnemyRect) + EnemyRect.Height / 2;
+
+        double angleRad = Math.Atan2(playerY - enemyY, playerX - enemyX);
+
+        double deltaX = enemySpeed * Math.Cos(angleRad);
+        double deltaY = enemySpeed * Math.Sin(angleRad);
+
+        double newLeft = Canvas.GetLeft(EnemyRect) + deltaX;
+        double newTop = Canvas.GetTop(EnemyRect) + deltaY;
+
+        Canvas.SetLeft(EnemyRect, newLeft);
+        Canvas.SetTop(EnemyRect, newTop);
+    }
+
 
     public void UpdateBullets(Canvas LobbyCan)
     {

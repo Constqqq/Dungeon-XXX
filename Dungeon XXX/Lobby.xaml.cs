@@ -51,6 +51,7 @@ namespace Dungeon_XXX
             InitializeAmmo();
             this.MouseDown += LobbyCan_MouseDown;
             InitializeEnemy(LobbyCan);
+            
 
         }
         private List<Rectangle> bullets = new List<Rectangle>();
@@ -290,7 +291,7 @@ namespace Dungeon_XXX
             Collide("x");
             Canvas.SetTop(Player, Canvas.GetTop(Player) - SpeedY);
             Collide("y");
-           // enemy.MoveTowardsPlayer(Player);
+           enemy.MoveTowardsPlayer(Player);
             enemy.ShootAtPlayer(Player, LobbyCan);
             enemy.UpdateBullets(LobbyCan);
            
