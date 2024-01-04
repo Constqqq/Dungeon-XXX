@@ -17,6 +17,7 @@ using Dungeon_XXX;
 
 
 
+
 namespace Dungeon_XXX
 {
     /// <summary>
@@ -35,6 +36,7 @@ namespace Dungeon_XXX
         private DispatcherTimer GameTimer = new DispatcherTimer();
         private bool UpkeyPressed, RightKeyPressed, DownKeyPressed, LeftKeyPressed;
         float SpeedX, SpeedY, Friction = 0.88f, Speed = 2;
+        
         public Lobby()
         
         {
@@ -43,7 +45,7 @@ namespace Dungeon_XXX
             
             LobbyCan.Focus();
             LobbyCan.IsHitTestVisible = true;
-
+            
             GameTimer.Interval = TimeSpan.FromMilliseconds(16);
             GameTimer.Tick += Gametick;
             GameTimer.Start();
@@ -51,14 +53,16 @@ namespace Dungeon_XXX
             InitializeAmmo();
             this.MouseDown += LobbyCan_MouseDown;
             InitializeEnemy(LobbyCan);
-            
+           
+
+
 
         }
         private List<Rectangle> bullets = new List<Rectangle>();
 
         private void InitializeEnemy(Canvas LobbyCan)
         {
-            enemy = new Enemy(LobbyCan.ActualWidth / 2, 50);
+            enemy = new Enemy(50, 50, LobbyCan);
             LobbyCan.Children.Add(enemy.EnemyRect);
         }
 
@@ -300,7 +304,7 @@ namespace Dungeon_XXX
 
 
 
-       
+
         private void Collide(string Dir)
         {
         foreach (var x in LobbyCan.Children.OfType<Rectangle>())
@@ -328,8 +332,10 @@ namespace Dungeon_XXX
 
                 
             }
-        }   
+        }
 
-        
+       
+
+
     }
 }

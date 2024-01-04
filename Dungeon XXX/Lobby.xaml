@@ -13,30 +13,19 @@
         <Canvas x:Name="LobbyCan" Focusable="True" KeyUp="KeyBoardUp" KeyDown="KeyboardDown" Height="861" Width="1570"  VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,-0.2"  >
 
 
-            <Rectangle  Canvas.Left="490" Canvas.Top="385" Width="41" Height="128"  Tag="Collide" RenderTransformOrigin="0.932,0.777"></Rectangle>
-            <Rectangle  Canvas.Left="1339" Canvas.Top="471" Width="41" Height="119"  Tag="Collide" RenderTransformOrigin="0.932,0.777"></Rectangle>
-            <Rectangle  Canvas.Left="1230" Canvas.Top="691" Width="32" Height="112"  Tag="Collide" RenderTransformOrigin="0.932,0.777"></Rectangle>
-            <Rectangle  Canvas.Left="961" Canvas.Top="717" Width="67" Height="84"  Tag="Collide" RenderTransformOrigin="0.932,0.777"></Rectangle>
-            <Rectangle  Canvas.Left="1372" Canvas.Top="78" Width="17" Height="105"  Tag="Collide" RenderTransformOrigin="0.932,0.777"></Rectangle>
-            <Rectangle  Canvas.Left="1451" Canvas.Top="213" Width="41" Height="140"  Tag="Collide" RenderTransformOrigin="0.932,0.777"></Rectangle>
-            <Rectangle  Canvas.Left="1230" Canvas.Top="153" Width="41" Height="142"  Tag="Collide" RenderTransformOrigin="0.932,0.777"></Rectangle>
-            <Rectangle  Canvas.Left="599" Canvas.Top="175" Width="64" Height="87"  Tag="Collide" RenderTransformOrigin="0.932,0.777"></Rectangle>
-            <Rectangle  Canvas.Left="394" Canvas.Top="105" Width="41" Height="114"  Tag="Collide" RenderTransformOrigin="0.932,0.777"></Rectangle>
-            <Rectangle  Canvas.Left="318" Canvas.Top="221" Width="46" Height="41"  Tag="Collide" RenderTransformOrigin="0.932,0.777"></Rectangle>
-            <Rectangle  Canvas.Left="178" Canvas.Top="196" Width="41" Height="128"  Tag="Collide" RenderTransformOrigin="0.932,0.777"></Rectangle>
-            <Rectangle  Canvas.Left="109" Canvas.Top="628" Width="41" Height="120"  Tag="Collide" RenderTransformOrigin="0.932,0.777"></Rectangle>
-            <Rectangle  Canvas.Left="328" Canvas.Top="783" Width="64" Height="49"  Tag="Collide" RenderTransformOrigin="0.932,0.777"></Rectangle>
-            <Rectangle  Canvas.Left="859" Canvas.Top="1" Width="132" Height="42"  Tag="Collide" RenderTransformOrigin="0.932,0.777"/>
-
-            <Rectangle Canvas.Top="801" Width="1570" Height="60"  Tag="Collide" RenderTransformOrigin="0.932,0.777" Canvas.Left="2"/>
-            <Rectangle Width="536" Height="1"  Tag="Collide" RenderTransformOrigin="0.932,0.777" Canvas.Left="996" Canvas.Top="5"/>
-            <Rectangle Width="714" Height="1"  Tag="Collide" RenderTransformOrigin="0.932,0.777" Canvas.Left="10" Canvas.Top="5"/>
-            <Rectangle  Canvas.Left="1537" Canvas.Top="5" Width="43" Height="860"  Tag="Collide" RenderTransformOrigin="0.932,0.777"/>
-            <Rectangle  Canvas.Left="2" Canvas.Top="51" Width="4" Height="752"  Tag="Collide" RenderTransformOrigin="0.932,0.777"/>
+            <Rectangle  Canvas.Left="537" Canvas.Top="169" Width="280" Height="48" Fill="Black"  Tag="Collide" RenderTransformOrigin="0.932,0.777"></Rectangle>
 
 
-            <Rectangle  Canvas.Left="50" Canvas.Top="105" Width="100" Height="100" Fill="Black" Tag="User" x:Name="Player"></Rectangle>
+
+            <Rectangle  Canvas.Left="50" Canvas.Top="155" Width="55" Height="50" Fill="Black" Tag="User" x:Name="Player"></Rectangle>
             <ProgressBar x:Name="HealthBar" Height="20" Canvas.Left="1339" Canvas.Top="11" Width="200" Foreground="Green" Background="Gray"/>
+            <Rectangle  Canvas.Left="537" Canvas.Top="330" Width="418" Height="48" Fill="Black"  Tag="Collide" RenderTransformOrigin="0.932,0.777"/>
+            <Rectangle  Canvas.Left="955" Canvas.Top="188" Width="41" Height="190" Fill="Black"  Tag="Collide" RenderTransformOrigin="0.932,0.777"/>
+            <Rectangle  Canvas.Left="817" Canvas.Top="76" Width="33" Height="141" Fill="Black"  Tag="Collide" RenderTransformOrigin="0.932,0.777"/>
+            <Rectangle  Canvas.Left="817" Canvas.Top="28" Width="246" Height="48" Fill="Black"  Tag="Collide" RenderTransformOrigin="0.932,0.777"/>
+            <Rectangle  Canvas.Left="996" Canvas.Top="188" Width="246" Height="48" Fill="Black"  Tag="Collide" RenderTransformOrigin="0.932,0.777"/>
+            <Rectangle  Canvas.Left="1242" Canvas.Top="28" Width="99" Height="208" Fill="Black"  Tag="Collide" RenderTransformOrigin="0.932,0.777"/>
+            <Rectangle  Canvas.Left="1063" Canvas.Top="28" Width="246" Height="48" Fill="Black"  Tag="Collide" RenderTransformOrigin="0.932,0.777"/>
 
         </Canvas>
 
