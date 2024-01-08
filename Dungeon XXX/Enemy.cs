@@ -8,13 +8,20 @@ using System.Linq;
 using System.Windows;
 using System.Threading;
 
+
 public class Enemy
 {
+   
+    private TimeSpan shootingCooldown = TimeSpan.FromSeconds(1.0);
+    private DateTime lastShotTime = DateTime.MinValue;
+    private double shootingDistance = 450;
     private Canvas LobbyCan;
     private double enemySpeedX = 2;
     private double enemySpeedY = 2;
-    public Rectangle EnemyRect { get; set; }
+    public Rectangle EnemyRect { get; private set; }
     public List<Bullet> Bullets { get; set; } = new List<Bullet>();
+    public int Health { get; set; } = 7;
+    public int damage = 1;
 
     public Enemy(double startX, double startY, Canvas lobbyCanvas)
     {
@@ -24,7 +31,8 @@ public class Enemy
             Width = 50,
             Height = 50,
             Fill = Brushes.Red,
-            Tag = "User"
+            Tag = "Enemy"
+            
         };
 
         Canvas.SetLeft(EnemyRect, startX);
@@ -35,90 +43,121 @@ public class Enemy
     }
 
 
-
-
-
-    public void MoveTowardsPlayer(Rectangle Player)
+   
+    public void CheckPlayerBulletCollisions(List<Rectangle> playerBullets)
     {
-        double playerX = Canvas.GetLeft(Player) + Player.Width / 2;
-        double playerY = Canvas.GetTop(Player) + Player.Height / 2;
+        Rect enemyRectBounds = new Rect(Canvas.GetLeft(EnemyRect), Canvas.GetTop(EnemyRect), EnemyRect.Width, EnemyRect.Height);
 
-        double enemyX = Canvas.GetLeft(EnemyRect) + EnemyRect.Width / 2;
-        double enemyY = Canvas.GetTop(EnemyRect) + EnemyRect.Height / 2;
-
-        double angleToPlayer = Math.Atan2(playerY - enemyY, playerX - enemyX);
-
-        // Передвигаемся к игроку сначала по направлению угла
-        double deltaX = enemySpeedX * Math.Cos(angleToPlayer);
-        double deltaY = enemySpeedY * Math.Sin(angleToPlayer);
-
-        double newLeft = Canvas.GetLeft(EnemyRect) + deltaX;
-        double newTop = Canvas.GetTop(EnemyRect) + deltaY;
-
-        // Проверяем, есть ли препятствие на пути
-        if (ObstacleOnPath(newLeft, newTop))
+        foreach (var bullet in playerBullets.ToList())
         {
-            // Ищем направление для обхода препятствия
-            double avoidanceAngle = FindAvoidanceAngle(enemyX, enemyY, playerX, playerY);
-            deltaX = enemySpeedX * Math.Cos(avoidanceAngle);
-            deltaY = enemySpeedY * Math.Sin(avoidanceAngle);
-
-            newLeft = Canvas.GetLeft(EnemyRect) + deltaX;
-            newTop = Canvas.GetTop(EnemyRect) + deltaY;
-        }
-
-        Canvas.SetLeft(EnemyRect, newLeft);
-        Canvas.SetTop(EnemyRect, newTop);
-    }
-
-    private bool ObstacleOnPath(double newLeft, double newTop)
-    {
-        Rect futureRect = new Rect(newLeft, newTop, EnemyRect.Width, EnemyRect.Height);
-
-        foreach (var obstacle in LobbyCan.Children.OfType<Rectangle>().Where(obj => obj.Tag != null && obj.Tag.ToString() == "Collide"))
-        {
-            Rect obstacleRect = new Rect(Canvas.GetLeft(obstacle), Canvas.GetTop(obstacle), obstacle.Width, obstacle.Height);
-
-            if (futureRect.IntersectsWith(obstacleRect))
+            if ((string)bullet.Tag == "MyBullet")
             {
-                return true; // Препятствие на пути
+                Rect bulletRect = new Rect(Canvas.GetLeft(bullet), Canvas.GetTop(bullet), bullet.Width, bullet.Height);
+
+                if (bulletRect.IntersectsWith(enemyRectBounds))
+                {
+                    Health -= damage;
+                    if (Health <= 0)
+                    {
+                        Die();
+                    }
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        LobbyCan.Children.Remove(bullet);
+                        playerBullets.Remove(bullet);
+                    });
+                }
             }
         }
-
-        return false; // Нет препятствия
     }
 
-    private double FindAvoidanceAngle(double enemyX, double enemyY, double playerX, double playerY)
+
+
+
+    private void Die()
     {
-        double avoidanceAngle = 0;
-        double angleIncrement = Math.PI / 180; // Угол увеличения (в радианах)
-
-        double maxViewAngle = Math.PI / 4; // Максимальный угол обзора
-
-        // Ищем свободное направление для обхода препятствия
-        for (double angle = -maxViewAngle; angle <= maxViewAngle; angle += angleIncrement)
+        if (LobbyCan.Children.Contains(EnemyRect))
         {
-            double testX = enemyX + enemySpeedX * Math.Cos(angle);
-            double testY = enemyY + enemySpeedY * Math.Sin(angle);
+            LobbyCan.Children.Remove(EnemyRect);
+        }
+    }
 
-            if (!ObstacleOnPath(testX, testY))
+
+    public void MoveTowardsPlayer(Rectangle Player, List<Rectangle> playerBullets)
+    {
+
+
+        CheckPlayerBulletCollisions(playerBullets);
+        if (Health > 0)
+        {
+            double playerX = Canvas.GetLeft(Player) + Player.Width / 2;
+            double playerY = Canvas.GetTop(Player) + Player.Height / 2;
+
+            double enemyX = Canvas.GetLeft(EnemyRect) + EnemyRect.Width / 2;
+            double enemyY = Canvas.GetTop(EnemyRect) + EnemyRect.Height / 2;
+
+            double distanceToPlayer = Math.Sqrt(Math.Pow(playerX - enemyX, 2) + Math.Pow(playerY - enemyY, 2));
+
+            if (distanceToPlayer > shootingDistance)
             {
-                avoidanceAngle = angle;
-                break;
+                double angleToPlayer = Math.Atan2(playerY - enemyY, playerX - enemyX);
+
+                double deltaX = enemySpeedX * Math.Cos(angleToPlayer);
+                double deltaY = enemySpeedY * Math.Sin(angleToPlayer);
+
+                double newLeft = Canvas.GetLeft(EnemyRect) + deltaX;
+                double newTop = Canvas.GetTop(EnemyRect) + deltaY;
+
+                if (newLeft >= 0 && newLeft + EnemyRect.Width <= LobbyCan.ActualWidth &&
+                    newTop >= 0 && newTop + EnemyRect.Height <= LobbyCan.ActualHeight)
+                {
+                    Rect futureRect = new Rect(newLeft, newTop, EnemyRect.Width, EnemyRect.Height);
+
+                    foreach (var obstacle in LobbyCan.Children.OfType<Rectangle>().Where(obj => obj.Tag != null && obj.Tag.ToString() == "Collide"))
+                    {
+                        Rect obstacleRect = new Rect(Canvas.GetLeft(obstacle), Canvas.GetTop(obstacle), obstacle.Width, obstacle.Height);
+
+                        if (futureRect.IntersectsWith(obstacleRect))
+                        {
+                            return;
+                        }
+                    }
+
+                    Canvas.SetLeft(EnemyRect, newLeft);
+                    Canvas.SetTop(EnemyRect, newTop);
+
+                }
+
+            }
+
+            else
+            {
+                // Проверяем, прошло ли достаточно времени с момента последнего выстрела
+                if ((DateTime.Now - lastShotTime) >= shootingCooldown)
+                {
+                    // Если прошло достаточно времени, выполняем выстрел и обновляем время последнего выстрела
+                    ShootAtPlayer(Player, LobbyCan);
+                    lastShotTime = DateTime.Now;
+                }
             }
         }
-
-        return avoidanceAngle;
     }
 
 
-    public void UpdateBullets(Canvas LobbyCan)
+
+
+
+
+    public void UpdateBullets(Canvas LobbyCan, Rectangle Player, int PlayerHealth)
     {
         List<Bullet> bulletsCopy = new List<Bullet>(Bullets);
 
         foreach (var bullet in bulletsCopy)
         {
+            
             bullet.UpdatePosition();
+            
 
             // Проверяем столкновение с элементами, имеющими тег "Collide"
             var obstacles = LobbyCan.Children.OfType<Rectangle>().Where(obj => obj.Tag != null && obj.Tag.ToString() == "Collide").ToList();
@@ -136,11 +175,36 @@ public class Enemy
                     break;
                 }
             }
+            // Проверяем столкновение с игроком
+            Rect bulletRect1 = new Rect(Canvas.GetLeft(bullet.BulletRect), Canvas.GetTop(bullet.BulletRect), bullet.BulletRect.Width, bullet.BulletRect.Height);
+            Rect playerRect = new Rect(Canvas.GetLeft(Player), Canvas.GetTop(Player), Player.Width, Player.Height);
 
-            // Удаляем пулю, если она выходит за пределы холста
-            
+            if (bulletRect1.IntersectsWith(playerRect))
+            {
+                PlayerHealth -= 1;
+
+
+                LobbyCan.Children.Remove(bullet.BulletRect);
+                if (PlayerHealth <= 0)
+                {
+
+                    LobbyCan.Children.Remove(Player);
+
+                }
+
+
+                // После этого вы можете проверить, умер ли игрок и выполнить соответствующие действия.
+                // Например, вызвать метод Die() для игрока, который удалит его с холста.
+                
+            }
+
+
+
         }
     }
+
+  
+
     public void ShootAtPlayer(Rectangle Player, Canvas LobbyCan)
     {
         
@@ -166,4 +230,6 @@ public class Enemy
         // Отображаем пулю
         LobbyCan.Children.Add(bullet.BulletRect);
     }
+    
+
 }

@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Dungeon_XXX;
 
 namespace Dungeon_XXX
 {
@@ -26,7 +27,7 @@ namespace Dungeon_XXX
         {
             BulletRect = new Rectangle
             {
-                Tag = "User",
+                
                 Width = 10,
                 Height = 20,
                 Fill = Brushes.Red,
@@ -45,6 +46,7 @@ namespace Dungeon_XXX
 
         public void UpdatePosition()
         {
+
             Canvas.SetLeft(BulletRect, Canvas.GetLeft(BulletRect) + DirectionX * Speed);
             Canvas.SetTop(BulletRect, Canvas.GetTop(BulletRect) + DirectionY * Speed);
         }
@@ -56,5 +58,7 @@ namespace Dungeon_XXX
 
             return left < 0 || top < 0 || left > canvasWidth || top > canvasHeight;
         }
+        
+
     }
 }
