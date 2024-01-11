@@ -26,21 +26,26 @@ namespace Dungeon_XXX
     /// </summary>
     public partial class Lobby : Window
     {
+        private Bonus bonus;
+        private bool bonusChoiseInProgress = false;
+        private bool waveInProgress = false;
+        private Bonus currentBonus;
         public int x = 5;
         private List<Enemy> enemies = new List<Enemy>();
         private WaveManager waveManager;
         public List<Wave> waves = new List<Wave>();
         private Enemy enemy;
-        public int PlayerHealth = 100;
-        private int magazineSize = 10;
+        public int PlayerHealth = 6;
+        public int magazineSize = 10;
         private int totalAmmo = 999999;
         private int bulletsInMagazine;
         private bool isReloading;
         private double currentBulletAngle = 0;
-        private Rectangle Bullet;
+        private Image Bullet;
+        private DispatcherTimer bonusTimer = new DispatcherTimer();
         private DispatcherTimer GameTimer = new DispatcherTimer();
         private bool UpkeyPressed, RightKeyPressed, DownKeyPressed, LeftKeyPressed;
-        float SpeedX, SpeedY, Friction = 0.88f, Speed = 2;
+        float SpeedX, SpeedY, Friction = 0.88f, Speed = 1;
 
         public class Wave
         {
@@ -56,16 +61,21 @@ namespace Dungeon_XXX
 
         public class WaveManager
         {
+           
             private List<Wave> waves;
             private int currentWaveIndex = 0;
             private DateTime lastWaveEndTime = DateTime.MinValue;
+          //  private bool waveInProgress = false;
 
             public WaveManager(List<Wave> waves)
             {
                 this.waves = waves;
+               
+                
             }
 
-            public void UpdateWave(Canvas lobbyCanvas, Rectangle Player, List<Rectangle> playerBullets, Canvas LobbyCan, int PlayerHealth, List<Enemy> enemies, int x)
+            
+            public void UpdateWave(Canvas lobbyCanvas, Image Player, List<Image> playerBullets, Canvas LobbyCan, int PlayerHealth, List<Enemy> enemies, int x)
             {
                 if (currentWaveIndex < waves.Count)
                 {
@@ -77,41 +87,56 @@ namespace Dungeon_XXX
                         SpawnEnemies(currentWave.EnemyCount, lobbyCanvas, Player, playerBullets, LobbyCan, PlayerHealth, enemies, x);
                         lastWaveEndTime = DateTime.Now;
                         currentWaveIndex++;
-                        
+
                     }
                 }
             }
 
-            private void SpawnEnemies(int count, Canvas lobbyCanvas, Rectangle Player, List<Rectangle> playerBullets, Canvas LobbyCan, int PlayerHealth, List<Enemy> enemies, int x)
+            private void SpawnEnemies(int count, Canvas lobbyCanvas, Image Player, List<Image> playerBullets, Canvas LobbyCan, int PlayerHealth, List<Enemy> enemies, int x)
             {
                 x++;
                 Random random = new Random();
 
                 for (int i = 0; i < count; i++)
                 {
-                    double startX = random.Next((int)lobbyCanvas.ActualWidth - 50);
-                    double startY = random.Next((int)lobbyCanvas.ActualHeight - 50);
+                    double startX;
+                    double startY;
+
+                    // Генерируем случайные координаты за пределами холста
+                    if (random.Next(2) == 0)
+                    {
+                        startX = random.Next((int)lobbyCanvas.ActualWidth, (int)lobbyCanvas.ActualWidth + 50);
+                        startY = random.NextDouble() * lobbyCanvas.ActualHeight;
+                    }
+                    else
+                    {
+                        startX = random.NextDouble() * lobbyCanvas.ActualWidth;
+                        startY = random.Next((int)lobbyCanvas.ActualHeight, (int)lobbyCanvas.ActualHeight + 50);
+                    }
 
                     // Создаем врага и добавляем на холст
                     Enemy enemy = new Enemy(startX, startY, lobbyCanvas);
                     enemies.Add(enemy);
                     lobbyCanvas.Children.Add(enemy.EnemyRect);
-                    enemy.UpdateBullets(LobbyCan, Player, PlayerHealth);
+                    enemy.UpdateBullets(LobbyCan, Player, ref PlayerHealth);
                     enemy.MoveTowardsPlayer(Player, playerBullets);
                 }
             }
         }
-
-        public Lobby()
+            public Lobby()
         
 
         {
 
             InitializeComponent();
-            
+
+            bonusTimer = new DispatcherTimer();
+            bonusTimer.Interval = TimeSpan.FromSeconds(45); // Интервал в 45 секунд
+            bonusTimer.Tick += BonusTimer_Tick;
+            bonusTimer.Start();
             LobbyCan.Focus();
             LobbyCan.IsHitTestVisible = true;
-            
+            InitializeBonus();
             GameTimer.Interval = TimeSpan.FromMilliseconds(16);
             GameTimer.Tick += Gametick;
             GameTimer.Start();
@@ -122,7 +147,7 @@ namespace Dungeon_XXX
             List<Wave> waves = new List<Wave>
             {
                 new Wave (1, TimeSpan.FromSeconds(0)),
-                new Wave (5, TimeSpan.FromSeconds(20)),
+                new Wave (5, TimeSpan.FromSeconds(10)),
                  new Wave (7, TimeSpan.FromSeconds(20)),
                   new Wave (8, TimeSpan.FromSeconds(20)),
                    new Wave (9, TimeSpan.FromSeconds(20)),
@@ -132,77 +157,77 @@ namespace Dungeon_XXX
                        new Wave (13, TimeSpan.FromSeconds(20)),
                         new Wave (14, TimeSpan.FromSeconds(20)),
                          new Wave (15, TimeSpan.FromSeconds(20)),
-                          new Wave (x, TimeSpan.FromSeconds(20)),
-                           new Wave (x, TimeSpan.FromSeconds(20)),
-                            new Wave (x, TimeSpan.FromSeconds(20)),
-                             new Wave (x, TimeSpan.FromSeconds(20)),
-                              new Wave (x, TimeSpan.FromSeconds(20)),
-                               new Wave (x, TimeSpan.FromSeconds(20)),
-                                new Wave (x, TimeSpan.FromSeconds(20)),
-                                 new Wave (x, TimeSpan.FromSeconds(20)),
-                                  new Wave (x, TimeSpan.FromSeconds(20)),
-                                   new Wave (x, TimeSpan.FromSeconds(20)),
-                                    new Wave (x, TimeSpan.FromSeconds(20)),
-                                     new Wave (x, TimeSpan.FromSeconds(20)),
-                                      new Wave (x, TimeSpan.FromSeconds(20)),
-                                       new Wave (x, TimeSpan.FromSeconds(20)),
-                                        new Wave (x, TimeSpan.FromSeconds(20)),
-                                         new Wave (x, TimeSpan.FromSeconds(20)),
-                                          new Wave (x, TimeSpan.FromSeconds(20)),
-                                           new Wave (x, TimeSpan.FromSeconds(20)),
-                                            new Wave (x, TimeSpan.FromSeconds(20)),
-                                             new Wave (x, TimeSpan.FromSeconds(20)),
-                                              new Wave (x, TimeSpan.FromSeconds(20)),
-                                               new Wave (x, TimeSpan.FromSeconds(20)),
-                                                new Wave (x, TimeSpan.FromSeconds(20)),
-                                                 new Wave (x, TimeSpan.FromSeconds(20)),
-                                                  new Wave (x, TimeSpan.FromSeconds(20)),
-                                                   new Wave (x, TimeSpan.FromSeconds(20)),
-                                                    new Wave (x, TimeSpan.FromSeconds(20)),
-                                                     new Wave (x, TimeSpan.FromSeconds(20)),
-                                                      new Wave (x, TimeSpan.FromSeconds(20)),
-                                                       new Wave (x, TimeSpan.FromSeconds(20)),
-                                                        new Wave (x, TimeSpan.FromSeconds(20)),
-                                                         new Wave (x, TimeSpan.FromSeconds(20)),
-                                                          new Wave (x, TimeSpan.FromSeconds(20)),
-                                                           new Wave (x, TimeSpan.FromSeconds(20)),
-                                                            new Wave (x, TimeSpan.FromSeconds(20)),
-                                                             new Wave (x, TimeSpan.FromSeconds(20)),
-                                                              new Wave (x, TimeSpan.FromSeconds(20)),
-                                                               new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                 new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                  new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                   new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                    new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                     new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                      new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                       new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                        new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                         new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                          new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                           new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                            new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                             new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                              new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                               new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                                new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                                 new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                                  new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                                   new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                                    new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                                     new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                                      new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                                       new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                                        new Wave (x, TimeSpan.FromSeconds(20)),
-                                                                                         new Wave (x, TimeSpan.FromSeconds(20)),
+                          new Wave (15, TimeSpan.FromSeconds(20)),
+                           new Wave (15, TimeSpan.FromSeconds(20)),
+                            new Wave (15, TimeSpan.FromSeconds(20)),
+                             new Wave (15, TimeSpan.FromSeconds(20)),
+                              new Wave (15, TimeSpan.FromSeconds(20)),
+                               new Wave (15, TimeSpan.FromSeconds(20)),
+                                new Wave (15, TimeSpan.FromSeconds(20)),
+                                 new Wave (15, TimeSpan.FromSeconds(20)),
+                                  new Wave (15, TimeSpan.FromSeconds(20)),
+                                   new Wave (15, TimeSpan.FromSeconds(20)),
+                                    new Wave (15, TimeSpan.FromSeconds(20)),
+                                     new Wave (15, TimeSpan.FromSeconds(20)),
+                                      new Wave (15, TimeSpan.FromSeconds(20)),
+                                       new Wave (15, TimeSpan.FromSeconds(20)),
+                                        new Wave (15, TimeSpan.FromSeconds(20)),
+                                         new Wave (15, TimeSpan.FromSeconds(20)),
+                                          new Wave (15, TimeSpan.FromSeconds(20)),
+                                           new Wave (15, TimeSpan.FromSeconds(20)),
+                                            new Wave (15, TimeSpan.FromSeconds(20)),
+                                             new Wave (15, TimeSpan.FromSeconds(20)),
+                                              new Wave (15, TimeSpan.FromSeconds(20)),
+                                               new Wave (15, TimeSpan.FromSeconds(20)),
+                                                new Wave (15, TimeSpan.FromSeconds(20)),
+                                                 new Wave (15, TimeSpan.FromSeconds(20)),
+                                                  new Wave (15, TimeSpan.FromSeconds(20)),
+                                                   new Wave (15, TimeSpan.FromSeconds(20)),
+                                                    new Wave (15, TimeSpan.FromSeconds(20)),
+                                                     new Wave (15, TimeSpan.FromSeconds(20)),
+                                                      new Wave (15, TimeSpan.FromSeconds(20)),
+                                                       new Wave (15, TimeSpan.FromSeconds(20)),
+                                                        new Wave (15, TimeSpan.FromSeconds(20)),
+                                                         new Wave (15, TimeSpan.FromSeconds(20)),
+                                                          new Wave (15, TimeSpan.FromSeconds(20)),
+                                                           new Wave (15, TimeSpan.FromSeconds(20)),
+                                                            new Wave (15, TimeSpan.FromSeconds(20)),
+                                                             new Wave (15, TimeSpan.FromSeconds(20)),
+                                                              new Wave (15, TimeSpan.FromSeconds(20)),
+                                                               new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                 new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                  new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                   new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                    new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                     new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                      new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                       new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                        new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                         new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                          new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                           new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                            new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                             new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                              new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                               new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                                new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                                 new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                                  new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                                   new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                                    new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                                     new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                                      new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                                       new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                                        new Wave (15, TimeSpan.FromSeconds(20)),
+                                                                                         new Wave (15, TimeSpan.FromSeconds(20)),
 
             };
 
             waveManager = new WaveManager(waves);
            
         }
-        public List<Rectangle> playerBullets = new List<Rectangle>();
+        public List<Image> playerBullets = new List<Image>();
 
         private void InitializeEnemy(Canvas LobbyCan)
         {
@@ -218,8 +243,38 @@ namespace Dungeon_XXX
 
         };
 
-
-     
+  /*    public void HpBar(int PlayerHealth)
+        {
+            if (PlayerHealth == 6)
+            {
+                Hbar.Source = new BitmapImage(new Uri(@"dead\3.png", UriKind.Relative));
+            }
+           else  if (PlayerHealth == 5)
+            {
+                Hbar.Source = new BitmapImage(new Uri(@"dead\25.png", UriKind.Relative));
+            }
+            else if (PlayerHealth == 4)
+            {
+                Hbar.Source = new BitmapImage(new Uri(@"dead\2.png", UriKind.Relative));
+            }
+            else if (PlayerHealth == 3)
+            {
+                Hbar.Source = new BitmapImage(new Uri(@"dead\15.png", UriKind.Relative));
+            }
+            else if (PlayerHealth == 2)
+            {
+                Hbar.Source = new BitmapImage(new Uri(@"dead\1.png", UriKind.Relative));
+            }
+            else if (PlayerHealth == 1)
+            {
+                Hbar.Source = new BitmapImage(new Uri(@"dead\05.png", UriKind.Relative));
+            }
+            else if (PlayerHealth == 0)
+            {
+                Hbar.Source = new BitmapImage(new Uri(@"dead\0.png", UriKind.Relative));
+            }
+        }
+     */
 
 
 
@@ -234,10 +289,14 @@ namespace Dungeon_XXX
 
         private void UpdateAmmoInfo()
         {
-            AmmoInfo.Text = $"Ammo: {totalAmmo}";
-            MagazineInfo.Text = $"Magazine: {bulletsInMagazine}/{magazineSize}";
+            
+            MagazineInfo.Text = $" {bulletsInMagazine}/{magazineSize}";
         }
-
+        private void UpdateHpinfo()
+        {
+            
+            Hepe.Text = $" {PlayerHealth}";
+        }
 
         private void LobbyCan_MouseMove(object sender, MouseEventArgs e)
         {
@@ -259,6 +318,7 @@ namespace Dungeon_XXX
                                                  mousePosition.X - (Canvas.GetLeft(Player) + Player.Width / 2));
 
                     CreateBullet(angleRad);
+                 //   Player.Source = BitmapFrame.Create(new Uri(@"dead\Udar.png", UriKind.Relative));
                     bulletsInMagazine--;
 
                     if (bulletsInMagazine == 0)
@@ -300,12 +360,12 @@ namespace Dungeon_XXX
         }
         private void CreateBullet(double angleRad)
         {
-            Rectangle bullet = new Rectangle
+            Image bullet = new Image
             {
                 Tag ="MyBullet",
                 Width = 10,
                 Height = 20,
-                Fill = Brushes.Red,
+                Source = BitmapFrame.Create(new Uri(@"dead\MyBullet.png", UriKind.Relative)),
                 Visibility = Visibility.Visible
             };
 
@@ -341,10 +401,12 @@ namespace Dungeon_XXX
             if (e.Key == Key.A)
             {
                 LeftKeyPressed = true;
+                Player.Source = BitmapFrame.Create(new Uri(@"dead\MestLevo.png", UriKind.Relative));
             }
             if (e.Key == Key.D)
             {
                 RightKeyPressed = true;
+                Player.Source = BitmapFrame.Create(new Uri(@"dead\MestPravo.png", UriKind.Relative));
             }
             if (e.Key == Key.R)
             {
@@ -355,7 +417,7 @@ namespace Dungeon_XXX
 
 
 
-        private void MoveBullet(Rectangle bullet, double angleRad)
+        private void MoveBullet(Image bullet, double angleRad)
         {
 
             double bulletSpeed = 7;
@@ -409,15 +471,19 @@ namespace Dungeon_XXX
             }
         }
 
-        
+        private void InitializeBonus()
+        {
+            bonus = new Bonus("Bonus", (PlayerHealth, magazineSize, Speed) => { });
+        }
+
 
         private void InitializeBullet()
         {
-            Bullet = new Rectangle
+            Bullet = new Image
             {
                 Width = 10,
                 Height = 20,
-                Fill = Brushes.Red,
+                Source = BitmapFrame.Create(new Uri(@"dead\MyBullet.png", UriKind.Relative)),
                 Visibility = Visibility.Hidden,
                 Tag = "Bullet"
             };
@@ -426,7 +492,11 @@ namespace Dungeon_XXX
         }
 
 
-        
+        public void BonusTimer_Tick(object sender, EventArgs e)
+        {
+            // Вызываем выбор случайного бонуса каждые 45 секунд
+            bonus.ChooseRandomBonus( LobbyCan, ref PlayerHealth,  ref magazineSize,  ref Speed);
+        }
 
 
         private void Gametick(object sender, EventArgs e)
@@ -454,23 +524,122 @@ namespace Dungeon_XXX
             Canvas.SetTop(Player, Canvas.GetTop(Player) - SpeedY);
             Collide("y");
             waveManager.UpdateWave(LobbyCan, Player,  playerBullets, LobbyCan, PlayerHealth, enemies, x);
-
-            foreach (var enemy in enemies)
+                        foreach (var enemy in enemies)
             {
                 enemy.MoveTowardsPlayer(Player, playerBullets);
-                enemy.UpdateBullets(LobbyCan, Player, PlayerHealth);
+                enemy.UpdateBullets(LobbyCan, Player, ref PlayerHealth);
+               // enemy.UpdateEnemyImage(direction);
             }
+            UpdateHpinfo();
 
-            
+
 
 
         }
 
+        public class Bonus
+        {
+            public string Name { get; set; }
+            public Action<int, int, float> ApplyBonus { get; set; }
+
+            public Bonus(string name, Action<int, int, float> applyBonus)
+            {
+                Name = name;
+                ApplyBonus = applyBonus;
+            }
 
 
 
 
-        private void Collide(string Dir)
+            public void ChooseRandomBonus(Canvas lobbyCanvas, ref int PlayerHealth, ref int magazineSize, ref float Speed)
+            {
+                int a, b = 0;
+                Random bns = new Random();
+
+                a = bns.Next(1,3);
+                
+                
+                if (a == 1)
+                {
+                    MessageBoxResult result = MessageBox.Show($"Choose a bonus:\n1. {"+Патроны"}\n2. {"+Скорость"}", "Bonus Selection", MessageBoxButton.YesNo);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        magazineSize += 10;
+                    }
+                    else
+                    {
+                       Speed += 1;
+                    }
+                    
+                }
+               else if (a == 2)
+                {
+                    MessageBoxResult result = MessageBox.Show($"Choose a bonus:\n1. {"+Здоровье"}\n2. {"+Скорость"}", "Bonus Selection", MessageBoxButton.YesNo);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        PlayerHealth += 2;
+                    }
+                    else
+                    {
+                        Speed += 1;
+                    }
+
+                }
+                else if (a == 3)
+                {
+                    MessageBoxResult result = MessageBox.Show($"Choose a bonus:\n1. {"+Здоровье"}\n2. {"+Патроны"}", "Bonus Selection", MessageBoxButton.YesNo);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        PlayerHealth += 2;
+                    }
+                    else
+                    {
+                        Speed += 1;
+                    }
+
+                }
+
+
+
+
+                /*      List<Bonus> availableBonuses = new List<Bonus>
+    {
+        new Bonus("Ammo Bonus", (int ph, int ms, float s) => { magazineSize += 10; }),
+        new Bonus("SpeedBonus", (int ph, int ms, float s) => { Speed += 2; }),
+        // другие бонусы
+    };
+
+                Random random = new Random();
+                int randomIndex1 = random.Next(availableBonuses.Count);
+                int randomIndex2;
+
+                do
+                {
+                    randomIndex2 = random.Next(availableBonuses.Count);
+                } while (randomIndex2 == randomIndex1);
+
+                Bonus bonus1 = availableBonuses[randomIndex1];
+                Bonus bonus2 = availableBonuses[randomIndex2];
+
+                MessageBoxResult result = MessageBox.Show($"Choose a bonus:\n1. {bonus1.Name}\n2. {bonus2.Name}", "Bonus Selection", MessageBoxButton.YesNo);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    bonus1.ApplyBonus(PlayerHealth, magazineSize, Speed);
+                }
+                else
+                {
+                    bonus2.ApplyBonus(PlayerHealth, magazineSize, Speed);
+                }*/
+            }
+        }
+
+
+
+            private void Collide(string Dir)
         {
         foreach (var x in LobbyCan.Children.OfType<Rectangle>())
             {
@@ -498,6 +667,8 @@ namespace Dungeon_XXX
                 
             }
         }
+
+
 
        
 

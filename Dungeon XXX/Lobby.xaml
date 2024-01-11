@@ -8,17 +8,23 @@
         mc:Ignorable="d"
         Title="Lobby" Height="890.4" Width="1576.8">
     <Grid x:Name="gridlobby">
-        <TextBlock x:Name="AmmoInfo" Text="Ammo: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
-        <TextBlock x:Name="MagazineInfo" Text="Magazine: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,30,0,0"/>
+        <Image Height="861" Source="FON.png" Stretch="Fill" Width="1570"/>
+
         <Canvas x:Name="LobbyCan" Focusable="True" KeyUp="KeyBoardUp" KeyDown="KeyboardDown" Height="861" Width="1570"  VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,-0.2"  >
 
-
-
-            <Rectangle  Canvas.Left="50" Canvas.Top="155" Width="55" Height="50" Fill="Black" Tag="User" x:Name="Player"></Rectangle>
-            
-            <Rectangle  Canvas.Left="643" Canvas.Top="140" Width="99" Height="208" Fill="Black"  Tag="Collide" RenderTransformOrigin="0.932,0.777"/>
-
+            <Rectangle Canvas.Top="10" Width="3" Height="900"  Tag="Collide" RenderTransformOrigin="0.932,0.777" Canvas.Left="10"/>
+            <Rectangle Width="10" Height="809"   Tag="Collide" RenderTransformOrigin="0.932,0.777" Canvas.Left="1543" Canvas.Top="18"/>
+            <Rectangle Width="1545" Height="3"   Tag="Collide" RenderTransformOrigin="0.932,0.777" Canvas.Left="15" Canvas.Top="10"/>
+            <Rectangle Width="1545" Height="3"   Tag="Collide" RenderTransformOrigin="0.932,0.777" Canvas.Left="8" Canvas.Top="775"/>
+            <Image Height="62" Canvas.Left="105" Source="MestPravo.png" Stretch="Fill" Canvas.Top="238" Width="68" Tag="User" x:Name="Player"/>
+            <Image Source="HPBAR.png" Stretch="Fill" Height="72" Canvas.Left="1458" Canvas.Top="43" Width="80"/>
+            <Image Source="MyBullet.png" Stretch="Fill" Canvas.Left="1431" Canvas.Top="120" Height="107" Width="107"/>
         </Canvas>
+        <TextBlock x:Name="Hepe" HorizontalAlignment="Left" Margin="1375,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="80" Width="80" Padding="3,0,0,0" FontSize="72" FontFamily="Ink Free"/>
+        <TextBlock x:Name="MagazineInfo" HorizontalAlignment="Left" Margin="1225,121,-27.6,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="102" Width="373" Padding="3,0,0,0" FontSize="72" FontFamily="Ink Free" RenderTransformOrigin="0.507,0.523"/>
+
+
+
 
 
 

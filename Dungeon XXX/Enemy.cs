@@ -7,66 +7,69 @@ using System.Windows.Shapes;
 using System.Linq;
 using System.Windows;
 using System.Threading;
-
+using System.Windows.Media.Imaging;
 
 public class Enemy
 {
-   
-    private TimeSpan shootingCooldown = TimeSpan.FromSeconds(1.0);
+
+    private TimeSpan shootingCooldown = TimeSpan.FromSeconds(4.0);
     private DateTime lastShotTime = DateTime.MinValue;
     private double shootingDistance = 450;
     private Canvas LobbyCan;
     private double enemySpeedX = 2;
     private double enemySpeedY = 2;
-    public Rectangle EnemyRect { get; private set; }
+    public Image EnemyRect { get; private set; }
     public List<Bullet> Bullets { get; set; } = new List<Bullet>();
-    public int Health { get; set; } = 7;
+    public int Health { get; set; } = 4;
     public int damage = 1;
+
 
     public Enemy(double startX, double startY, Canvas lobbyCanvas)
     {
         LobbyCan = lobbyCanvas;
-        EnemyRect = new Rectangle
+        EnemyRect = new Image
         {
             Width = 50,
             Height = 50,
-            Fill = Brushes.Red,
-            Tag = "Enemy"
-            
-        };
 
+            Tag = "Enemy"
+
+        };
+        EnemyRect.Source = BitmapFrame.Create(new Uri(@"Enemy\MestLevoE.png", UriKind.Relative));
         Canvas.SetLeft(EnemyRect, startX);
         Canvas.SetTop(EnemyRect, startY);
 
         Bullets = new List<Bullet>();
-       
+
     }
 
 
-   
-    public void CheckPlayerBulletCollisions(List<Rectangle> playerBullets)
+
+    public void CheckPlayerBulletCollisions(List<Image> playerBullets)
     {
         Rect enemyRectBounds = new Rect(Canvas.GetLeft(EnemyRect), Canvas.GetTop(EnemyRect), EnemyRect.Width, EnemyRect.Height);
-
-        foreach (var bullet in playerBullets.ToList())
+        if (Health > 0)
         {
-            if ((string)bullet.Tag == "MyBullet")
+            foreach (var bullet in playerBullets.ToList())
             {
-                Rect bulletRect = new Rect(Canvas.GetLeft(bullet), Canvas.GetTop(bullet), bullet.Width, bullet.Height);
-
-                if (bulletRect.IntersectsWith(enemyRectBounds))
+                if ((string)bullet.Tag == "MyBullet")
                 {
-                    Health -= damage;
-                    if (Health <= 0)
-                    {
-                        Die();
-                    }
+                    Rect bulletRect = new Rect(Canvas.GetLeft(bullet), Canvas.GetTop(bullet), bullet.Width, bullet.Height);
 
-                    Application.Current.Dispatcher.Invoke(() =>
+                    if (bulletRect.IntersectsWith(enemyRectBounds))
                     {
-                        LobbyCan.Children.Remove(bullet);
-                        playerBullets.Remove(bullet);
-                    });
+                        Health -= damage;
+                        if (Health <= 0)
+                        {
+                            Die();
+                        }
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            LobbyCan.Children.Remove(bullet);
+                            playerBullets.Remove(bullet);
+                        });
+                    }
                 }
             }
         }
@@ -82,11 +85,53 @@ public class Enemy
             LobbyCan.Children.Remove(EnemyRect);
         }
     }
-
-
-    public void MoveTowardsPlayer(Rectangle Player, List<Rectangle> playerBullets)
+    public enum Direction
     {
+        Left,
+        Right,
+        Down,
+        Up
+    }
+    private Direction GetEnemyDirection(Point playerPosition, Point enemyPosition)
+    {
+        double deltaX = playerPosition.X - enemyPosition.X;
+        double deltaY = playerPosition.Y - enemyPosition.Y;
 
+        if (Math.Abs(deltaX) > Math.Abs(deltaY))
+        {
+            return (deltaX > 0) ? Direction.Right : Direction.Left;
+        }
+        else
+        {
+            return (deltaY > 0) ? Direction.Down : Direction.Up;
+        }
+    }
+    public void UpdateEnemyImage(Direction direction)
+    {
+        string imagePath = @"Enemy\MestPravoE.png";
+
+        switch (direction)
+        {
+            
+            
+            case Direction.Left:
+                imagePath = @"Enemy\MestLevoE.png";
+                break;
+            case Direction.Right:
+                imagePath = @"Enemy\MestPravoE.png";
+                break;
+        }
+
+        if (!string.IsNullOrEmpty(imagePath))
+        {
+            Uri uri = new Uri(imagePath, UriKind.Relative);
+            BitmapImage bitmapImage = new BitmapImage(uri);
+            EnemyRect.Source = bitmapImage;
+        }
+    }
+    public void MoveTowardsPlayer(Image Player, List<Image> playerBullets)
+    {
+        
 
         CheckPlayerBulletCollisions(playerBullets);
         if (Health > 0)
@@ -109,25 +154,16 @@ public class Enemy
                 double newLeft = Canvas.GetLeft(EnemyRect) + deltaX;
                 double newTop = Canvas.GetTop(EnemyRect) + deltaY;
 
-                if (newLeft >= 0 && newLeft + EnemyRect.Width <= LobbyCan.ActualWidth &&
-                    newTop >= 0 && newTop + EnemyRect.Height <= LobbyCan.ActualHeight)
-                {
-                    Rect futureRect = new Rect(newLeft, newTop, EnemyRect.Width, EnemyRect.Height);
+               
+                
+                    
 
-                    foreach (var obstacle in LobbyCan.Children.OfType<Rectangle>().Where(obj => obj.Tag != null && obj.Tag.ToString() == "Collide"))
-                    {
-                        Rect obstacleRect = new Rect(Canvas.GetLeft(obstacle), Canvas.GetTop(obstacle), obstacle.Width, obstacle.Height);
-
-                        if (futureRect.IntersectsWith(obstacleRect))
-                        {
-                            return;
-                        }
-                    }
+                    
 
                     Canvas.SetLeft(EnemyRect, newLeft);
                     Canvas.SetTop(EnemyRect, newTop);
 
-                }
+                
 
             }
 
@@ -149,7 +185,7 @@ public class Enemy
 
 
 
-    public void UpdateBullets(Canvas LobbyCan, Rectangle Player, int PlayerHealth)
+    public void UpdateBullets(Canvas LobbyCan, Image Player, ref int PlayerHealth)
     {
         List<Bullet> bulletsCopy = new List<Bullet>(Bullets);
 
@@ -181,10 +217,14 @@ public class Enemy
 
             if (bulletRect1.IntersectsWith(playerRect))
             {
-                PlayerHealth -= 1;
+                PlayerHealth -= damage;
 
-
-                LobbyCan.Children.Remove(bullet.BulletRect);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    LobbyCan.Children.Remove(bullet.BulletRect);
+                    Bullets.Remove(bullet);
+                });
+                    
                 if (PlayerHealth <= 0)
                 {
 
@@ -193,8 +233,7 @@ public class Enemy
                 }
 
 
-                // После этого вы можете проверить, умер ли игрок и выполнить соответствующие действия.
-                // Например, вызвать метод Die() для игрока, который удалит его с холста.
+                
                 
             }
 
@@ -205,7 +244,7 @@ public class Enemy
 
   
 
-    public void ShootAtPlayer(Rectangle Player, Canvas LobbyCan)
+    public void ShootAtPlayer(Image Player, Canvas LobbyCan)
     {
         
         double enemyCenterX = Canvas.GetLeft(EnemyRect) + EnemyRect.Width / 2;
@@ -230,6 +269,7 @@ public class Enemy
         // Отображаем пулю
         LobbyCan.Children.Add(bullet.BulletRect);
     }
-    
 
+
+    
 }

@@ -18,21 +18,21 @@ namespace Dungeon_XXX
 {
     public class Bullet
     {
-        public Rectangle BulletRect { get; set; }
+        public Image BulletRect { get; set; }
         public double DirectionX { get; set; }
         public double DirectionY { get; set; }
         public double Speed { get; set; }
 
         public Bullet(double startX, double startY, double directionX, double directionY)
         {
-            BulletRect = new Rectangle
+            BulletRect = new Image
             {
                 
                 Width = 10,
                 Height = 20,
-                Fill = Brushes.Red,
-              //  Visibility = Visibility.Hidden
-            };
+                Source = BitmapFrame.Create(new Uri(@"Enemy\EnemyBullet.png", UriKind.Relative))
+            //  Visibility = Visibility.Hidden
+        };
 
             Canvas.SetLeft(BulletRect, startX);
             Canvas.SetTop(BulletRect, startY);

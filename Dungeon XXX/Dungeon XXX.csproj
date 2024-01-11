@@ -176,5 +176,23 @@
   <ItemGroup>
     <Resource Include="lobbyback2.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="MestPravo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="location1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="FON.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="HPBAR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="MyBullet.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
